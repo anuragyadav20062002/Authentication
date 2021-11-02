@@ -3,6 +3,7 @@ const express = require("express")
 const ejs = require("ejs")
 const bodyParser = require("body-parser")
 const { appendFileSync } = require("fs")
+const mongoose = require("mongoose")
 
 const app = express()
 
@@ -13,6 +14,15 @@ app.use(
     extended: true,
   })
 )
+
+mongoose.connect("mongodb://localhost:27017/userDB", { useNewUrlParser: true })
+
+const userSchema = {
+  email: String,
+  password: String,
+}
+
+const User = new mongoose.model("User", userSchema)
 
 app.get("/", function (req, res) {
   res.render("home")
