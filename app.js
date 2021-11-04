@@ -47,8 +47,15 @@ const User = mongoose.model("User", userSchema)
 
 passport.use(User.createStrategy())
 
-passport.serializeUser(User.serializeUser())
-passport.deserializeUser(User.deserializeUser())
+passport.serializeUser(function (user, done) {
+  done(null, user.id)
+})
+
+passport.deserializeUser(function (id, done) {
+  User.findById(id, function (err, user) {
+    done(err, user)
+  })
+})
 
 passport.use(
   new GoogleStrategy(
@@ -56,9 +63,10 @@ passport.use(
       clientID: process.env.CID,
       clientSecret: process.env.CSECRET,
       callbackURL: "http://localhost:3000/auth/google/secrets",
-      userProfileURL: "https://www.googleapis.com/outh2/v3/userinfo",
+      userProfileURL: "https://www.googleapis.com/outh2/v3/userinfo.profile",
     },
     function (accessToken, refreshToken, profile, cb) {
+      console.log(profile)
       User.findOrCreate({ googleId: profile.id }, function (err, user) {
         return cb(err, user)
       })
@@ -69,6 +77,20 @@ passport.use(
 app.get("/", function (req, res) {
   res.render("home")
 })
+
+app.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["email", "profile"] })
+)
+
+app.get(
+  "/auth/google/secrets",
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  function (req, res) {
+    // Successful authentication, redirect secrets.
+    res.redirect("/secrets")
+  }
+)
 
 app.get("/login", function (req, res) {
   res.render("login")
