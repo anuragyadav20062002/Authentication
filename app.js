@@ -5,8 +5,6 @@ const ejs = require("ejs")
 const bodyParser = require("body-parser")
 const { appendFileSync } = require("fs")
 const mongoose = require("mongoose")
-const bcrypt = require("bcrypt")
-const saltRounds = 10
 
 const app = express()
 
@@ -39,42 +37,9 @@ app.get("/register", function (req, res) {
   res.render("register")
 })
 
-app.post("/register", function (req, res) {
-  bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
-    const newUser = new User({
-      email: req.body.username,
-      password: hash,
-    })
+app.post("/register", function (req, res) {})
 
-    newUser.save(function (err) {
-      if (err) {
-        console.log(err)
-      } else {
-        res.render("secrets")
-      }
-    })
-  })
-})
-
-app.post("/login", function (req, res) {
-  const username = req.body.username
-  const password = req.body.password
-
-  User.findOne({ email: username }, function (err, founduser) {
-    if (err) {
-      console.log(err)
-    }
-    if (founduser) {
-      bcrypt.compare(password, founduser.password, function (err, result) {
-        if (result === true) {
-          res.render("secrets")
-        } else {
-          console.log("Incorrect password")
-        }
-      })
-    }
-  })
-})
+app.post("/login", function (req, res) {})
 //////listening//////
 
 app.listen(3000, function () {
