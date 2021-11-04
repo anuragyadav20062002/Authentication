@@ -9,6 +9,8 @@ const session = require("express-session")
 const passport = require("passport")
 const passportLocalMongoose = require("passport-local-mongoose")
 const GoogleStrategy = require("passport-google-oauth20").Strategy
+const findOrCreate = require("mongoose-findorcreate")
+const { use } = require("passport")
 
 const app = express()
 
@@ -39,6 +41,7 @@ const userSchema = new mongoose.Schema({
 })
 
 userSchema.plugin(passportLocalMongoose)
+userSchema.plugin(findOrCreate)
 
 const User = mongoose.model("User", userSchema)
 
